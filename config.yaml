@@ -1,0 +1,100 @@
+# Medical Image Enhancement GAN Configuration
+# Target: 42% image quality improvement
+
+# Model Configuration
+model:
+  input_shape: [256, 256, 1]  # Height, Width, Channels
+  learning_rate: 0.0002       # Adam learning rate
+  beta_1: 0.5                 # Adam beta_1 parameter
+
+# Data Configuration  
+data:
+  data_dir: "data/synthetic"  # Path to training data
+  image_size: [256, 256]      # Target image size
+  validation_split: 0.2       # 20% for validation
+  
+# Training Configuration
+training:
+  epochs: 100                 # Maximum training epochs
+  batch_size: 8               # Batch size (adjust based on GPU memory)
+  seed: 42                    # Random seed for reproducibility
+  
+  # Intervals
+  save_interval: 10           # Save checkpoint every N epochs
+  sample_interval: 5          # Generate samples every N epochs  
+  validation_interval: 5      # Run validation every N epochs
+  
+  # Early stopping
+  patience: 15                # Stop if no improvement for N epochs
+  
+  # 42% Target Achievement
+  target_clinical_score: 1.42 # Clinical score for 42% improvement
+  
+# Paths Configuration
+paths:
+  checkpoints: "models/checkpoints"
+  results: "results"
+  logs: "logs"
+  data: "data"
+
+# Experiment Tracking
+use_wandb: false              # Enable Weights & Biases logging
+wandb_project: "medical-image-enhancement"
+
+# API Configuration (for deployment)
+api:
+  host: "0.0.0.0"
+  port: 5000
+  debug: false
+  max_content_length: 33554432  # 32MB
+  max_batch_size: 10
+  
+# AWS Deployment Configuration
+deployment:
+  aws_region: "us-east-1"
+  instance_type: "g4dn.xlarge" # GPU instance for inference
+  docker_image: "medical-gan:latest"
+  
+# Clinical Validation Thresholds
+clinical:
+  excellent_psnr: 30.0        # dB
+  good_psnr: 25.0            # dB
+  excellent_ssim: 0.90       # 0-1 scale
+  good_ssim: 0.80            # 0-1 scale
+  diagnostic_sharpness: 1.2   # improvement ratio
+  diagnostic_contrast: 1.15   # improvement ratio
+  
+# Data Augmentation
+augmentation:
+  horizontal_flip: 0.5        # Probability
+  rotation_range: 5           # Degrees ±
+  brightness_range: 0.1       # ± range
+  contrast_range: 0.15        # ± range
+
+# Loss Function Weights
+loss_weights:
+  adversarial: 1.0           # GAN loss
+  pixel_wise: 100.0          # L1/L2 reconstruction loss
+  perceptual: 10.0           # VGG perceptual loss
+  
+# Quality Degradation for Training Pairs
+degradation:
+  types: ["downsample", "blur", "noise", "compression", "mixed"]
+  downsample_range: [0.25, 0.5]      # Scale factors
+  blur_sigma_range: [1.0, 3.0]       # Gaussian blur
+  noise_level_range: [0.05, 0.15]    # Gaussian noise std
+  compression_quality_range: [20, 50] # JPEG quality
+
+# Performance Optimization
+performance:
+  mixed_precision: true       # Use mixed precision training
+  cache_dataset: true         # Cache preprocessed data
+  prefetch_buffer: 2          # Dataset prefetch buffer
+  num_parallel_calls: 4       # Data loading parallelism
+
+# Evaluation Configuration
+evaluation:
+  batch_size: 1               # Evaluation batch size
+  max_images: null            # Max images to evaluate (null = all)
+  save_samples: true          # Save sample enhanced images
+  generate_report: true       # Generate evaluation report
